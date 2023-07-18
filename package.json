@@ -1,0 +1,19 @@
+{
+  "name": "drag-and-drop-list",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pablobrodt/drag-and-drop-list.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pablobrodt/drag-and-drop-list/issues"
+  },
+  "homepage": "https://github.com/pablobrodt/drag-and-drop-list#readme"
+}
