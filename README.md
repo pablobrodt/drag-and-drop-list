@@ -8,7 +8,7 @@
    1. target: es6
    2. rootDir: ./src
    3. sourceMap: true
-   4. outDir: ./build
+   4. outDir: ./dist
    5. exclude: [node_modules]
 4. set up run (lite-server) and watch script
 5. set up debug config for vscode
