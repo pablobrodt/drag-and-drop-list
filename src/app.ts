@@ -1,7 +1,7 @@
-// CustomDocument class
-class CustomDocument {
+// Render class
+abstract class Render<T extends HTMLElement = HTMLElement> {
     protected templateElement: HTMLTemplateElement;
-    protected templateFirstChild: HTMLElement;
+    protected templateFirstChild: T;
     protected hostElement: HTMLDivElement;
 
     constructor(templateId: string) {
@@ -11,19 +11,19 @@ class CustomDocument {
         const deepClone = true;
         const importedNode = document.importNode(this.templateElement.content, deepClone);
 
-        this.templateFirstChild = importedNode.firstElementChild as HTMLElement;
+        this.templateFirstChild = importedNode.firstElementChild as T;
     }
 
-    protected getTemplateFirstChild<T>() {
-        return this.templateFirstChild as T;
-    }
-
-    protected getElementById<T>(id: string): T {
+    protected getElementById<T extends HTMLElement = HTMLElement>(id: string): T {
         return document.getElementById(id) as T;
     }
 
-    protected querySelector<T>(selector: string): T {
+    protected querySelector<T extends HTMLElement = HTMLElement>(selector: string): T {
         return this.templateFirstChild.querySelector(selector) as T;
+    }
+
+    protected attach(where: InsertPosition) {
+        this.hostElement.insertAdjacentElement(where, this.templateFirstChild);
     }
 }
 
@@ -108,7 +108,7 @@ const peopleValidation: Validation = {
 }
 
 // ProjectInput class
-class ProjectInput extends CustomDocument {
+class ProjectInput extends Render<HTMLFormElement> {
     titleInputElement: HTMLInputElement;
     descriptionInputElement: HTMLInputElement;
     peopleInputElement: HTMLInputElement;
@@ -123,7 +123,7 @@ class ProjectInput extends CustomDocument {
         this.peopleInputElement = this.querySelector('#people');
 
         this.configure();
-        this.attatch();
+        this.attach('afterbegin');
     }
 
     private gatherUserInput(): [string, string, number] {
@@ -172,14 +172,37 @@ class ProjectInput extends CustomDocument {
     }
 
     private configure() {
-        const element = this.getTemplateFirstChild<HTMLFormElement>();
-        
-        element.addEventListener('submit', this.submitHandler);
+        this.templateFirstChild.addEventListener('submit', this.submitHandler);
     }
+}
 
-    private attatch() {
-        this.hostElement.insertAdjacentElement('afterbegin', this.templateFirstChild);
+// ProjectList class
+enum ProjectListType {
+    ACTIVE = 'active',
+    FINISHED = 'finished',
+};
+
+class ProjectList extends Render {
+    constructor(private type: ProjectListType) {
+        super('project-list');
+
+        this.templateFirstChild.id = `${this.type}-projects`;
+
+        this.attach('beforeend');
+        this.renderContent();
+    }
+    
+    private renderContent() {
+        const listId = `${this.type}-projects-list`;
+
+        const listElement = this.querySelector('ul');
+        const titleElement = this.querySelector('h2');
+
+        listElement.id = listId;
+        titleElement.textContent = `${this.type.toUpperCase()} PROJECTS`
     }
 }
 
 const projectInput = new ProjectInput();
+const activeProjectsList = new ProjectList(ProjectListType.ACTIVE);
+const finishedProjectsList = new ProjectList(ProjectListType.FINISHED);
