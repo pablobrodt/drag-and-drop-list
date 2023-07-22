@@ -107,6 +107,67 @@ const peopleValidation: Validation = {
     max: 5,
 }
 
+// State management
+type StateListener<T = any> = (state: T) => void;
+
+abstract class State<T> {
+    protected state?: T;
+    private listeners: StateListener<T>[] = [];
+
+    protected setState(value: T) {
+        this.state = value
+
+        for (const listener of this.listeners) {
+            listener(this.state);
+        }
+    }
+
+    public addListener(newListener: StateListener<T>) {
+        this.listeners = [...this.listeners, newListener];
+    }
+}
+
+interface Project {
+    id: string;
+    title: string;
+    description: string;
+    people: number;
+}
+
+class ProjectState extends State<Project[]> {
+    private static instance: ProjectState;
+
+    private constructor() {
+        super();
+
+        this.state = [];
+    } 
+
+    public static getInstance() {
+        if (this.instance) {
+            return this.instance;
+        }
+
+        this.instance = new ProjectState();
+
+        return this.instance;
+    }
+
+    public addProject(title: string, description: string, people: number) {
+        const project: Project = {
+            id: Math.random().toString(),
+            title,
+            description,
+            people,
+        }
+
+        const oldProjects = this.state ?? [];
+        const newState = [...oldProjects, project] as Project[];
+
+        this.setState(newState);
+    }
+}
+
 // ProjectInput class
 class ProjectInput extends Render<HTMLFormElement> {
     titleInputElement: HTMLInputElement;
@@ -162,8 +223,9 @@ class ProjectInput extends Render<HTMLFormElement> {
         }
 
         if (validate(titleValidatable) && validate(descriptionValidatable) && validate(peopleValidatable)) {
+            const projectState = ProjectState.getInstance();
 
-            console.log('@@@', title, description, people);
+            projectState.addProject(title, description, people);
 
             this.clearInputs();
         } else {
@@ -183,22 +245,48 @@ enum ProjectListType {
 };
 
 class ProjectList extends Render {
+    private projects: Project[] = [];
+    private listElement?: HTMLUListElement;
+
     constructor(private type: ProjectListType) {
         super('project-list');
 
         this.templateFirstChild.id = `${this.type}-projects`;
 
+        const projectState = ProjectState.getInstance();
+
+        projectState.addListener((projects) => {
+            this.projects = projects;
+
+            this.renderProjects();
+        })
+
         this.attach('beforeend');
         this.renderContent();
     }
     
-    private renderContent() {
+    private setListElement() {
         const listId = `${this.type}-projects-list`;
 
-        const listElement = this.querySelector('ul');
+        this.listElement = this.querySelector('ul');
+
+        this.listElement.id = listId;
+    }
+
+    private renderProjects() {
+        for (const project of this.projects) {
+            const listItemElement: HTMLLIElement = document.createElement('li');
+            listItemElement.textContent = project.title;
+
+            this.listElement?.appendChild(listItemElement);
+        }
+    }
+    
+    private renderContent() {
+        this.setListElement();
+
         const titleElement = this.querySelector('h2');
 
-        listElement.id = listId;
         titleElement.textContent = `${this.type.toUpperCase()} PROJECTS`
     }
 }
