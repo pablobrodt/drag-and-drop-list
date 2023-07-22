@@ -40,13 +40,71 @@ function Autobind(_target: any, _methodName: string, descriptor: PropertyDescrip
     return newDescriptor;
 }
 
-// Validation function
-function validateInputLength(...inputs: HTMLInputElement[]): boolean {
-    return inputs.every((input) => {
-        const trimmedValue = input.value.trim();
+// Validation
+interface Validation {
+    required?: boolean;
+    minLength?: number;
+    maxLength?: number;
+    min?: number;
+    max?: number;
+}
 
-        return trimmedValue.length > 0;
-    })
+interface Validatable extends Validation {
+    value: string | number;
+}
+
+function validate(validatable: Validatable) {
+    const { value, required, minLength, maxLength, min, max } = validatable;
+    
+    const isString = typeof value === 'string';
+    const isNumber = typeof value === 'number';
+
+    let isValid = true;
+
+    if (required) {
+        const valueString = value.toString().trim();
+
+        isValid = isValid && valueString.length > 0;
+    }
+
+    if (isString) {
+        if (minLength !== undefined) {
+            isValid = isValid && value.length >= minLength;
+        }
+    
+        if (maxLength !== undefined) {
+            isValid = isValid && value.length <= maxLength;
+        }
+    }
+
+
+    if (isNumber) {
+        if (min !== undefined) {
+            isValid = isValid && value >= min;
+        }
+    
+        if (max !== undefined) {
+            isValid = isValid && value <= max;
+        }
+    }
+
+    return isValid;
+}
+
+const titleValidation: Validation = {
+    required: true,
+}
+
+const descriptionValidation: Validation = {
+    required: true,
+    minLength: 10,
+    maxLength: 200,
+}
+
+const peopleValidation: Validation = {
+    required: true,
+    min: 1,
+    max: 5,
 }
 
 // ProjectInput class
@@ -68,14 +126,7 @@ class ProjectInput extends CustomDocument {
         this.attatch();
     }
 
-    private gatherUserInput(): [string, string, number] | void {
-        const areInputsValid = validateInputLength(this.titleInputElement, this.descriptionInputElement, this.peopleInputElement)
-
-        if (areInputsValid === false) {
-            alert('Formulario invalido');
-            return;
-        }
-
+    private gatherUserInput(): [string, string, number] {
         const enteredTitle = this.titleInputElement.value.trim();
         const enteredDescription = this.descriptionInputElement.value.trim();
         const enteredPeople = Number(this.peopleInputElement.value.trim());
@@ -93,14 +144,30 @@ class ProjectInput extends CustomDocument {
     private submitHandler(event: Event): void {
         event.preventDefault();
 
-        const userInputs = this.gatherUserInput();
+        const [title, description, people] = this.gatherUserInput();
 
-        if (Array.isArray(userInputs)) {
-            const [title, description, people] = userInputs;
+        const titleValidatable: Validatable = {
+            value: title,
+            ...titleValidation,
+        }
+
+        const descriptionValidatable: Validatable = {
+            value: description,
+            ...descriptionValidation,
+        }
+
+        const peopleValidatable: Validatable = {
+            value: people,
+            ...peopleValidation,
+        }
+
+        if (validate(titleValidatable) && validate(descriptionValidatable) && validate(peopleValidatable)) {
 
             console.log('@@@', title, description, people);
 
             this.clearInputs();
+        } else {
+            alert('Formulário inválido!')
         }
     }
 
