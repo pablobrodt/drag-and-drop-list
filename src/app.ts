@@ -264,7 +264,13 @@ class ProjectList extends Render {
         const projectState = ProjectState.getInstance();
 
         projectState.addListener((projects) => {
-            this.projects = projects;
+            this.projects = projects.filter((project) => {
+                if(this.type === ProjectListType.ACTIVE) {
+                    return project.status === ProjectStatus.ACTIVE;
+                }
+
+                return project.status === ProjectStatus.FINISHED;
+            });
 
             this.renderProjects();
         })
@@ -282,11 +288,15 @@ class ProjectList extends Render {
     }
 
     private renderProjects() {
-        for (const project of this.projects) {
-            const listItemElement: HTMLLIElement = document.createElement('li');
-            listItemElement.textContent = project.title;
+        if(this.listElement) {
+            this.listElement.innerHTML = '';
 
-            this.listElement?.appendChild(listItemElement);
+            for (const project of this.projects) {
+                const listItemElement: HTMLLIElement = document.createElement('li');
+                listItemElement.textContent = project.title;
+    
+                this.listElement.appendChild(listItemElement);
+            }
         }
     }
     
