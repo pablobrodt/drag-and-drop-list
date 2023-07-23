@@ -127,11 +127,19 @@ abstract class State<T> {
     }
 }
 
-interface Project {
-    id: string;
-    title: string;
-    description: string;
-    people: number;
+enum ProjectStatus {
+    ACTIVE,
+    FINISHED,
+}
+
+class Project {
+    constructor(
+        public id: string,
+        public title: string,
+        public description: string,
+        public people: number,
+        public status: ProjectStatus = ProjectStatus.ACTIVE,
+    ) {}
 }
 
 class ProjectState extends State<Project[]> {
@@ -154,15 +162,15 @@ class ProjectState extends State<Project[]> {
     }
 
     public addProject(title: string, description: string, people: number) {
-        const project: Project = {
-            id: Math.random().toString(),
+        const project = new Project(
+            Math.random().toString(),
             title,
             description,
-            people,
-        }
+            people
+        );
 
         const oldProjects = this.state ?? [];
-        const newState = [...oldProjects, project] as Project[];
+        const newState = [...oldProjects, project];
 
         this.setState(newState);
     }
