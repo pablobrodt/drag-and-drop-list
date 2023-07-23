@@ -4,7 +4,7 @@ abstract class Render<T extends HTMLElement = HTMLElement> {
     protected templateFirstChild: T;
     protected hostElement: HTMLDivElement;
 
-    constructor(templateId: string) {
+    constructor(templateId: string, childElementId: string) {
         this.templateElement = this.getElementById(templateId);
         this.hostElement = this.getElementById('app');
 
@@ -12,13 +12,15 @@ abstract class Render<T extends HTMLElement = HTMLElement> {
         const importedNode = document.importNode(this.templateElement.content, deepClone);
 
         this.templateFirstChild = importedNode.firstElementChild as T;
+
+        this.templateFirstChild.id = childElementId;
     }
 
-    protected getElementById<T extends HTMLElement = HTMLElement>(id: string): T {
+    protected getElementById<T extends HTMLElement>(id: string): T {
         return document.getElementById(id) as T;
     }
 
-    protected querySelector<T extends HTMLElement = HTMLElement>(selector: string): T {
+    protected querySelector<T extends HTMLElement>(selector: string): T {
         return this.templateFirstChild.querySelector(selector) as T;
     }
 
@@ -108,7 +110,7 @@ const peopleValidation: Validation = {
 }
 
 // State management
-type StateListener<T = any> = (state: T) => void;
+type StateListener<T> = (state: T) => void;
 
 abstract class State<T> {
     protected state?: T;
@@ -183,9 +185,7 @@ class ProjectInput extends Render<HTMLFormElement> {
     peopleInputElement: HTMLInputElement;
 
     constructor() {
-        super('project-input');
-
-        this.templateFirstChild.id = 'user-input';
+        super('project-input', 'user-input');
 
         this.titleInputElement = this.querySelector('#title');
         this.descriptionInputElement = this.querySelector('#description');
@@ -257,9 +257,7 @@ class ProjectList extends Render {
     private listElement?: HTMLUListElement;
 
     constructor(private type: ProjectListType) {
-        super('project-list');
-
-        this.templateFirstChild.id = `${this.type}-projects`;
+        super('project-list', `${type}-projects`);
 
         const projectState = ProjectState.getInstance();
 
