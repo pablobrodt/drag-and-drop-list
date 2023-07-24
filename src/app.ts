@@ -136,12 +136,16 @@ abstract class State<T> {
     protected state?: T;
     private listeners: StateListener<T>[] = [];
 
+    private notifyListeners() {
+        for (const listener of this.listeners) {
+            listener(this.state as T);
+        }
+    }
+
     protected setState(value: T) {
         this.state = value
 
-        for (const listener of this.listeners) {
-            listener(this.state);
-        }
+        this.notifyListeners();
     }
 
     public addListener(newListener: StateListener<T>) {
@@ -180,6 +184,34 @@ class ProjectState extends State<Project[]> {
         const newState = [...oldProjects, project];
 
         this.setState(newState);
+    }
+
+    public moveProject(id: string, newStatus: ProjectStatus) {
+        if (this.state) {
+            const shouldUpdateProject = this.state.some((project) => {
+                return project.id === id && project.status !== newStatus
+            });
+    
+            if (!shouldUpdateProject) {
+                return;
+            }
+    
+            const updatedProjects = this.state.map((project) => {
+                if (project.id !== id) {
+                    return project;
+                }
+                
+                return new Project(
+                    project.id,
+                    project.title,
+                    project.description,
+                    project.people,
+                    newStatus,
+                );
+            });
+    
+            this.setState(updatedProjects);
+        }
     }
 }
 
@@ -367,7 +399,21 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
 
     @Autobind
     dropHandler(event: DragEvent): void {
-        console.log('@@@ drop event', event.dataTransfer?.getData('text/plain'));
+        if (event.dataTransfer) {
+            const projectId = event.dataTransfer.getData('text/plain');
+            let newStatus: ProjectStatus;
+
+            switch (this.type) {
+                case ProjectListType.ACTIVE: newStatus = ProjectStatus.ACTIVE;
+                    break;
+                case ProjectListType.FINISHED: newStatus = ProjectStatus.FINISHED;
+                    break;
+            }
+
+            const projectState = ProjectState.getInstance();
+
+            projectState.moveProject(projectId, newStatus);
+        }
     }
 
     @Autobind
