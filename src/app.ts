@@ -1,3 +1,15 @@
+// Drag and Drop interfaces
+interface Draggable {
+    dragStartHandler(event: DragEvent): void;
+    dragEndHandler(event: DragEvent): void;
+}
+
+interface DragTarget {
+    dragOverHandler(event: DragEvent): void;
+    dropHandler(event: DragEvent): void;
+    dragLeaveHandler(event: DragEvent): void;
+}
+
 // Component class
 type ComponentParams = {
     hostId: string,
@@ -261,7 +273,7 @@ type ProjectItemParams =
     | Pick<ComponentParams, 'hostId'>
     & { project: Project }
 
-class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements Draggable {
     private project: Project;
 
     get persons() {
@@ -280,8 +292,24 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
 
         this.project = project;
 
+        this.configure();
         this.attach('beforeend');
         this.renderContent();
+    }
+
+    @Autobind
+    dragStartHandler(event: DragEvent): void {
+        console.log('@@@ drag start', event);
+    }
+
+    @Autobind
+    dragEndHandler(event: DragEvent): void {
+        console.log('@@@ drag end', event);
+    }
+
+    configure() {
+        this.element.addEventListener('dragstart', this.dragStartHandler);
+        this.element.addEventListener('dragend', this.dragEndHandler);
     }
 
     renderContent(): void {
@@ -297,9 +325,10 @@ enum ProjectListType {
     FINISHED = 'finished',
 };
 
-class ProjectList extends Component<HTMLDivElement, HTMLElement> {
+class ProjectList extends Component<HTMLDivElement, HTMLElement> implements DragTarget {
     private projects: Project[] = [];
     private listElement?: HTMLUListElement;
+    private readonly droppableClass: string = 'droppable';
 
     constructor(private type: ProjectListType) {
         super({ hostId: 'app', templateId: 'project-list', elementId: `${type}-projects` });
@@ -318,16 +347,35 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
             this.renderProjects();
         })
 
+        this.configure();
         this.attach('beforeend');
         this.renderContent();
     }
-    
-    private setListElement() {
+
+    @Autobind
+    dragOverHandler(_event: DragEvent): void {
+        this.listElement?.classList.add(this.droppableClass);
+    }
+
+    @Autobind
+    dropHandler(event: DragEvent): void {
+        console.log('@@@ drop handler', event);
+    }
+
+    @Autobind
+    dragLeaveHandler(_event: DragEvent): void {
+        this.listElement?.classList.remove(this.droppableClass);
+    }
+
+    private configure() {
         const listId = `${this.type}-projects-list`;
 
         this.listElement = this.querySelector('ul');
-
         this.listElement.id = listId;
+
+        this.listElement.addEventListener('dragover', this.dragOverHandler);
+        this.listElement.addEventListener('dragleave', this.dragLeaveHandler);
+        this.listElement.addEventListener('drop', this.dropHandler);
     }
 
     private renderProjects() {
@@ -343,8 +391,6 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     }
     
     renderContent() {
-        this.setListElement();
-
         const titleElement = this.querySelector('h2');
 
         titleElement.textContent = `${this.type.toUpperCase()} PROJECTS`
