@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "lite-server -c bs-config.json",
+    "start": "npm run build && lite-server -c bs-config.json",
     "watch": "tsc --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "postbuild": "cpy ./index.html ./dist"
+    "postbuild": "cpy ./index.html ./dist && cpy ./app.css ./dist"
   },
   "repository": {
     "type": "git",
