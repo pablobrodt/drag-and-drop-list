@@ -13,3 +13,13 @@
 4. set up run (lite-server) and watch script
 5. set up debug config for vscode
 6. add gitignore file
+
+
+## Changelog
+
+### 1.0.0
+Single file project following course instructions
+
+### 2.0.0
+- Separated code into files using namespaces
+- Added some scripts to run and build
