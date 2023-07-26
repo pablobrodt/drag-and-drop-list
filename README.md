@@ -1,5 +1,7 @@
 # drag-and-drop-list
 
+[This project can be accessed here](https://pablobrodt.github.io/drag-and-drop-list/)
+
 ## Steps i did for this project setup
 
 1. npm init to start package.json file
@@ -13,7 +15,6 @@
 4. set up run (lite-server) and watch script
 5. set up debug config for vscode
 6. add gitignore file
-
 
 ## Changelog
 
