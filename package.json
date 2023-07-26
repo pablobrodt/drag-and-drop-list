@@ -8,7 +8,8 @@
     "watch": "tsc --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "postbuild": "cpy ./index.html ./dist && cpy ./app.css ./dist"
+    "postbuild": "cpy ./index.html ./dist && cpy ./app.css ./dist",
+    "gh-pages": "git subtree push --prefix dist origin gh-pages"
   },
   "repository": {
     "type": "git",

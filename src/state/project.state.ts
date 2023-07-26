@@ -1,66 +1,65 @@
-/// <reference path='base.state.ts' />
-/// <reference path='../models/project.model.ts' />
+import { State } from './base.state.js';
+import { Project } from '../models/project.model.js';
+import type { ProjectStatus } from '../models/project.model.js';
 
-namespace App {
-    export class ProjectState extends State<Project[]> {
-        private static instance: ProjectState;
+export class ProjectState extends State<Project[]> {
+    private static instance: ProjectState;
 
-        private constructor() {
-            super();
+    private constructor() {
+        super();
 
-            this.state = [];
-        } 
+        this.state = [];
+    } 
 
-        public static getInstance() {
-            if (this.instance) {
-                return this.instance;
-            }
-
-            this.instance = new ProjectState();
-
+    public static getInstance() {
+        if (this.instance) {
             return this.instance;
         }
 
-        public addProject(title: string, description: string, people: number) {
-            const project = new Project(
-                Math.random().toString(),
-                title,
-                description,
-                people
-            );
+        this.instance = new ProjectState();
 
-            const oldProjects = this.state ?? [];
-            const newState = [...oldProjects, project];
+        return this.instance;
+    }
 
-            this.setState(newState);
-        }
+    public addProject(title: string, description: string, people: number) {
+        const project = new Project(
+            Math.random().toString(),
+            title,
+            description,
+            people
+        );
 
-        public moveProject(id: string, newStatus: ProjectStatus) {
-            if (this.state) {
-                const shouldUpdateProject = this.state.some((project) => {
-                    return project.id === id && project.status !== newStatus
-                });
-        
-                if (!shouldUpdateProject) {
-                    return;
-                }
-        
-                const updatedProjects = this.state.map((project) => {
-                    if (project.id !== id) {
-                        return project;
-                    }
-                    
-                    return new Project(
-                        project.id,
-                        project.title,
-                        project.description,
-                        project.people,
-                        newStatus,
-                    );
-                });
-        
-                this.setState(updatedProjects);
+        const oldProjects = this.state ?? [];
+        const newState = [...oldProjects, project];
+
+        this.setState(newState);
+    }
+
+    public moveProject(id: string, newStatus: ProjectStatus) {
+        if (this.state) {
+            const shouldUpdateProject = this.state.some((project) => {
+                return project.id === id && project.status !== newStatus
+            });
+    
+            if (!shouldUpdateProject) {
+                return;
             }
+    
+            const updatedProjects = this.state.map((project) => {
+                if (project.id !== id) {
+                    return project;
+                }
+                
+                return new Project(
+                    project.id,
+                    project.title,
+                    project.description,
+                    project.people,
+                    newStatus,
+                );
+            });
+    
+            this.setState(updatedProjects);
         }
     }
 }
