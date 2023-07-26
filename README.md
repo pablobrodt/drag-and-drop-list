@@ -23,3 +23,7 @@ Single file project following course instructions
 ### 2.0.0
 - Separated code into files using namespaces
 - Added some scripts to run and build
+
+### 3.0.0
+- Changed namespaces to esmodule
+- Added script to push dist files to github pages branch
