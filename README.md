@@ -28,3 +28,7 @@ Single file project following course instructions
 ### 3.0.0
 - Changed namespaces to esmodule
 - Added script to push dist files to github pages branch
+
+### 4.0.0
+- Added webpack to build project
+- Remove script that pushed dist files to github pages due to use of github actions to build and distribute project

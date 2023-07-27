@@ -1,10 +1,10 @@
-import { Component } from './base.component.js';
-import { Project, ProjectStatus } from '../models/project.model.js';
-import { ProjectState } from '../state/project.state.js';
-import { Autobind } from '../decorators/autobind.decorator.js';
-import { ProjectItem } from './project-item.component.js';
+import { Component } from './base.component';
+import { Project, ProjectStatus } from '../models/project.model';
+import { ProjectState } from '../state/project.state';
+import { Autobind } from '../decorators/autobind.decorator';
+import { ProjectItem } from './project-item.component';
 
-import type { DragTarget } from '../models/drag-and-drop.interface.js';
+import type { DragTarget } from '../models/drag-and-drop.interface';
 
 export enum ProjectListType {
     ACTIVE = 'active',
