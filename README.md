@@ -31,3 +31,4 @@ Single file project following course instructions
 
 ### 4.0.0
 - Added webpack to build project
+- Remove script that pushed dist files to github pages due to use of github actions to build and distribute project
