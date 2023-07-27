@@ -1,9 +1,9 @@
-import { Project } from '../models/project.model.js';
-import { Component } from './base.component.js';
-import { Autobind } from '../decorators/autobind.decorator.js';
+import { Project } from '../models/project.model';
+import { Component } from './base.component';
+import { Autobind } from '../decorators/autobind.decorator';
 
-import type { ComponentParams } from './base.component.js';
-import type { Draggable } from '../models/drag-and-drop.interface.js';
+import type { ComponentParams } from './base.component';
+import type { Draggable } from '../models/drag-and-drop.interface';
 
 type ProjectItemParams = 
     | Pick<ComponentParams, 'hostId'>

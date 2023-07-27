@@ -1,9 +1,9 @@
-import { Autobind } from '../decorators/autobind.decorator.js';
-import { ProjectState } from '../state/project.state.js';
-import { validate } from '../util/validation.util.js';
-import { Component } from './base.component.js';
+import { Autobind } from '../decorators/autobind.decorator';
+import { ProjectState } from '../state/project.state';
+import { validate } from '../util/validation.util';
+import { Component } from './base.component';
 
-import type { Validatable, Validation } from '../util/validation.util.js';
+import type { Validatable, Validation } from '../util/validation.util';
 
 const titleValidation: Validation = {
     required: true,
